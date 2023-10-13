@@ -1,0 +1,425 @@
+import flet as ft
+
+
+def main(page: ft.Page):
+    def update_price(e):
+        price_sum = "合計金額 : " + str(int(cd1.value)*100 + int(cb2.value)*200 +int(cb3.value)*300 +int(cb4.value)*100 + int(cb5.value)*200) + "円"
+        price.value = price_sum
+        price.update()
+
+    def update_price2(e):
+        
+        price_sum = "合計金額 : " + str ( int(slider1.value)*160 + int(slider2.value)*160 + int(slider3.value)*160 + int(slider4.value)*160 +int(slider5.value)*140 +int(slider6.value)*140 +int(slider7.value)*160 +int(slider8.value)*180 +int(slider9.value)*190 +int(slider10.value)*200 ) + "円"
+        price.value = price_sum
+        price.update()
+        page.update()
+        #print(int(slider1.value)+int(slider2.value) )
+
+    # マイナスボタンクリック時の処理
+    def minus_click(e):
+        #Controlインスタンスのvalueプロパティに代入
+        txt_number.value = str(int(txt_number.value) - 1) 
+        #ページを更新。(txt_number.update()としても良い。updateは子要素に伝達する)
+        page.update() 
+
+    # プラスボタンクリック時の処理
+    def plus_click(a):
+        txt_number.value = str(int(txt_number.value) + 1)
+        page.update()
+        print (a)
+
+    def submit(e):
+        #注文ボタンが押された時の処理
+        print ("注文されました")
+         # チェックボックスのvalueを取得
+        is_kanetu = kanetu.value  # 加熱希望のチェックボックスのvalueを取得
+
+        # 各チェックボックスのvalueを取得
+        cb1_value = slider1.value
+        cb2_value = slider2.value
+        cb3_value = slider3.value
+        cb4_value = slider4.value
+        cb5_value = slider5.value
+        cb6_value = slider6.value
+        cb7_value = slider7.value
+        cb8_value = slider8.value
+        cb9_value = slider9.value
+        cb10_value = slider10.value
+        
+        #整理券番号の取得
+        dd_value = dd.value
+
+        # 必要なライブラリをインポート
+        import xml.etree.ElementTree as ET
+        import datetime
+        import os
+        
+        #lbxを複製する
+        import shutil
+        shutil.copyfile(r"複製元のファイルのパス", r"複製したファイルのパス")
+        
+        def change_extension(filename, new_extension):
+        #時間をUNIX時間で取得
+            base_name = os.path.splitext(filename)[0]
+            new_filename = base_name + new_extension
+            return new_filename
+
+         # 変更したいファイルのパスと新しい拡張子を指定
+        old_file_path = r"複製したファイルのパス"
+        new_extension = ".zip"
+        # 新しい拡張子を持つファイル名を生成
+        new_file_path = change_extension(old_file_path, new_extension)
+        # あたらしいやつが存在したら　消す
+        if os.path.exists(new_file_path):
+            os.remove(new_file_path)
+
+        # ファイルをリネームして保存
+        os.rename(old_file_path, new_file_path)
+
+        newfilename=new_file_path
+
+        #zipフォルダを解凍
+        import zipfile
+        with zipfile.ZipFile(newfilename) as existing_zip:
+            existing_zip.extractall(r"解凍後のフォルダのパスを指定")
+        # XMLファイルを読み込む
+        file_path = r"解凍後のフォルダのlabel.xmlファイルのパス"
+        tree = ET.parse(file_path)
+        root = tree.getroot()
+
+        #商品リスト
+        coffee_list=[[1,"カフェラテ"],
+        [2,"ノンスイート"],
+        [3,"カカオミント"],
+        [4,"クリーミーラテ"]]
+        pan_list=[
+        [5,"焼きチーズもち"],
+        [6,"オールドファッション"],
+        [7,"ミニラスク"],
+        [8,"チョコパイ"],
+        [9,"よこすかメイプルメロンパン"],
+        [10,"よこすか海軍カレーパン"]]
+        
+        #変数リスト
+        coffee_hennsuu=[cb1_value,cb2_value,cb3_value,cb4_value]
+        pan_hennsuu=[cb5_value,cb6_value,cb7_value,cb8_value,cb9_value,cb10_value]
+        
+        # 置換する文字列を指定
+        old_string1 = "TimeTimeTime"
+        from datetime import datetime
+
+        date = datetime.now()
+        # 2023/08/01 09:00:00
+        time_str = date.strftime('%H:%M')
+        new_string1= str(time_str)
+
+        old_string2="Number"
+        new_string2=str(dd_value)
+
+        old_string3="coffee1coffee1coffee1"
+        old_string4="coffee2coffee2coffee2"
+        
+        if coffee_hennsuu.count(0)<=2:
+            for i in range(4):
+                if coffee_hennsuu[i]>=1:
+                    new_string3=coffee_list[i][1] + " " +str(coffee_hennsuu[i])+"個"
+                    coffee_hennsuu[i]=0
+                    break
+            for i in range(4):
+                if coffee_hennsuu[i]>=1:
+                    new_string4=coffee_list[i][1] + " " +str(coffee_hennsuu[i])+"個"
+                    break 
+        elif coffee_hennsuu.count(0)==4:     
+            new_string3=""
+            new_string4=""
+        else:    
+            for i in range(4):
+                if coffee_hennsuu[i]>=1:
+                    new_string3=coffee_list[i][1] + " " +str(coffee_hennsuu[i])+"個"
+                    new_string4=""
+                    break
+
+        
+
+        old_string5="pan1pan1pan1pan1"
+        old_string6="pan2pan2pan2pan2"
+        new_string5=""
+        new_string6=""
+        if pan_hennsuu.count(0)<=4:
+            for i in range(6):
+                if pan_hennsuu[i]>=1:
+                    new_string5=pan_list[i][1] + " " +str(pan_hennsuu[i])+"個"
+                    pan_hennsuu[i]=0
+                    break
+            for i in range(6):
+                if pan_hennsuu[i]>=1:
+                    new_string6=pan_list[i][1] + " " +str(pan_hennsuu[i])+"個"
+                    break 
+        elif pan_hennsuu.count(0)==6:     
+            new_string5=""
+            new_string6=""
+        else:    
+            for i in range(4):
+                if pan_hennsuu[i]>=1:
+                    new_string5=pan_list[i][1] + " " +str(pan_hennsuu[i])+"個"
+                    new_string6=""
+                    break
+        old_string7="rennzi"
+        if is_kanetu:
+            new_string7="加熱希望"
+        else:
+            new_string7="加熱なし"
+
+        # XMLのテキスト要素を検索して置換
+        for elem in root.iter():
+            if elem.text is not None:
+                elem.text = elem.text.replace(old_string1, new_string1)
+                elem.text = elem.text.replace(old_string2, new_string2)
+                elem.text = elem.text.replace(old_string3, new_string3)
+                elem.text = elem.text.replace(old_string4, new_string4)
+                elem.text = elem.text.replace(old_string5, new_string5)
+                elem.text = elem.text.replace(old_string6, new_string6)
+                elem.text = elem.text.replace(old_string7, new_string7)
+                
+                elem.text = elem.text.replace(old_string1+"Len", str(len(new_string1)))
+                elem.text = elem.text.replace(old_string2+"Len", str(len(new_string2)))
+                elem.text = elem.text.replace(old_string3+"Len", str(len(new_string3)))
+                elem.text = elem.text.replace(old_string4+"Len", str(len(new_string4)))
+                elem.text = elem.text.replace(old_string5+"Len", str(len(new_string5))) 
+                elem.text = elem.text.replace(old_string6+"Len", str(len(new_string6)))
+                elem.text = elem.text.replace(old_string7+"Len", str(len(new_string7)))
+
+        tree.write(file_path,encoding="utf-8")
+
+        print("指定した文字列を置換しました。")
+        # 既存のZIPファイルを消去する　存在する場合
+        if os.path.exists(r"C:\Users\Agepa\Desktop\starprint.zip"):
+            os.remove(r"C:\Users\Agepa\Desktop\starprint.zip")
+        #label.xmlを圧縮する
+        
+        os.system('powershell -Command Compress-Archive -Path 圧縮するlabel.xmlファイルのパス -DestinationPath 圧縮後のファイルのパスを指定')
+
+        def change_extension(filename, new_extension):
+            #時間をUNIX時間で取得
+            base_name = os.path.splitext(filename)[0]
+            new_filename = base_name + new_extension
+            return new_filename
+        #zp.close()
+
+        
+        # 変更したいファイルのパスと新しい拡張子を指定
+        
+        old_file_path = r"圧縮後のzipファイル"
+        new_extension = ".lbx"
+
+        # 新しい拡張子を持つファイル名を生成
+        new_file_path = change_extension(old_file_path, new_extension)
+        # あたらしいやつが存在したら　消す
+        if os.path.exists(new_file_path):
+            os.remove(new_file_path)
+
+        # ファイルをリネームして保存
+        os.rename(old_file_path, new_file_path)
+        
+        
+
+        
+        # 印刷起動ここから
+        import win32com.client
+        import os
+        import pythoncom
+        pythoncom.CoInitialize()
+        doc = win32com.client.DispatchEx("bpac.Document")
+        # プリンタ名のリストを取得
+        printers = doc.Printer.GetInstalledPrinters
+
+        if not printers:
+            print("利用可能なプリンタが見つかりません")
+        else:
+            # リストの最初のプリンタ名を選択
+            selected_printer = printers[0]
+            doc.SetPrinter(selected_printer, True)
+
+        dir = os.path.abspath(os.path.dirname(__file__))
+        lbx_path = os.path.join(dir, "印刷するファイル名")
+        hasOpened = doc.Open(lbx_path)
+
+        doc.StartPrint("", 0x04000000)
+
+        doc.PrintOut(1, 0x04000000)
+
+        doc.EndPrint
+        doc.Close
+        #印刷終了
+       
+
+    # タイトル設定
+    page.title = "注文画面"
+
+    # Text を作成
+    t = ft.Text(
+        value="注文する商品を入力してください",
+    )
+
+    txt_number = ft.TextField(value="0", text_align=ft.TextAlign.RIGHT, width=100)
+
+    co1 = ft.Row(
+        [
+            ft.IconButton(ft.icons.REMOVE, on_click=minus_click),
+            txt_number,
+            ft.IconButton(ft.icons.ADD, on_click=plus_click),
+        ],
+    )
+
+    slider1 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co1 = ft.Row(
+        [   
+            ft.Text(value="カフェラテ"),
+            slider1
+        ],
+    )
+
+    slider2 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co2 = ft.Row(
+        [   
+            ft.Text(value="ノンスイート"),
+            slider2
+        ],
+    )
+
+    slider3 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co3 = ft.Row(
+        [   
+            ft.Text(value="カカオミント"),
+            slider3
+        ],
+    )
+
+    slider4 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co4 = ft.Row(
+        [   
+            ft.Text(value="クリーミーラテ"),
+            slider4
+        ],
+    )
+
+    slider5 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co5 = ft.Row(
+        [   
+            ft.Text(value="焼きチーズもち"),
+            slider5
+        ],
+    )
+
+    slider6 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co6 = ft.Row(
+        [   
+            ft.Text(value="オールドファッション"),
+            slider6
+        ],
+    )
+
+    slider7 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co7 = ft.Row(
+        [   
+            ft.Text(value="ミニラスク"),
+            slider7
+        ],
+    )
+
+    slider8 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co8 = ft.Row(
+        [   
+            ft.Text(value="チョコパイ"),
+            slider8
+        ],
+    )
+
+    slider9 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co9 = ft.Row(
+        [   
+            ft.Text(value="よこすかメイプルメロンパン"),
+            slider9
+        ],
+    )
+    slider10 = ft.Slider(min=0, max=5, divisions=5, label="{value}個",on_change= update_price2,value = 0)
+    co10 = ft.Row(
+        [   
+            ft.Text(value="よこすか海軍カレーパン"),
+            slider10
+        ],
+    )
+
+    kanetu = ft.Checkbox(
+        label="加熱希望", value=False,
+
+    )
+
+
+    dd = ft.Dropdown(
+        label="整理券番号を選択",
+        width=200,
+        options=[
+            ft.dropdown.Option("1"),
+            ft.dropdown.Option("2"),
+            ft.dropdown.Option("3"),
+            ft.dropdown.Option("4"),
+            ft.dropdown.Option("5"),
+            ft.dropdown.Option("6"),
+            ft.dropdown.Option("7"),
+            ft.dropdown.Option("8"),
+            ft.dropdown.Option("9"),
+            ft.dropdown.Option("10"),
+            ft.dropdown.Option("11"),
+            ft.dropdown.Option("12"),
+            ft.dropdown.Option("13"),
+            ft.dropdown.Option("14"),
+            ft.dropdown.Option("15"),
+            ft.dropdown.Option("16"),
+            ft.dropdown.Option("17"),
+            ft.dropdown.Option("18"),
+            ft.dropdown.Option("19"),
+            ft.dropdown.Option("20"),
+            ft.dropdown.Option("21"),
+            ft.dropdown.Option("22"),
+            ft.dropdown.Option("23"),
+            ft.dropdown.Option("24"),
+            ft.dropdown.Option("25"),
+            ft.dropdown.Option("26"),
+            ft.dropdown.Option("27"),
+            ft.dropdown.Option("28"),
+            ft.dropdown.Option("29"),
+            ft.dropdown.Option("30")
+            
+        ],
+    )
+
+    eb1 = ft.ElevatedButton("注文", icon=ft.icons.SHOPPING_CART_ROUNDED,on_click= submit )
+    price = ft.Text(value="合計金額 : 0円", text_align=ft.TextAlign.LEFT, width=500)
+
+    saigo = ft.Row(
+        [   
+            kanetu,
+            eb1,
+            price
+        ],
+    )
+
+
+    # Page に追加
+    page.add(
+        ft.Card(
+            content=ft.Container(
+                content=ft.Column(
+                    controls=[
+                        t,co1,co2,co3,co4,co5,co6,co7,co8,co9,co10,dd,saigo
+                    ], spacing=20,
+                ), padding=20
+            ), margin=20
+        )
+    )
+    # page.add(t) は↓と同じなので add を使えばよい
+    # page.controls.append(t)
+    # page.update()
+
+ft.app(target=main,port=8500,view=ft.WEB_BROWSER)
